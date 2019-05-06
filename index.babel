@@ -1,0 +1,34 @@
+
+const { h, app } = hyperapp
+/** @jsx h */
+const state = {
+  parsed: ``
+}
+
+const actions = {
+  parseString: str => state => ({
+    parsed: marked(str, {
+      sanitize: true
+    })
+  })
+}
+
+const dangerouslySetInnerHTML = (el, str) => {
+  el ? el.innerHTML = str : null
+}
+
+const TextArea = ({parse}) => (
+  <textarea 
+    oninput={ debounce(parse, 200)} 
+    placeholder='Type some markdown here'>
+   </textarea>
+)
+
+const view = (state, actions) => (
+  <div id='editor'>
+   <TextArea parse={e => actions.parseString(e.target.value)} />
+   <div onupdate={el => dangerouslySetInnerHTML(el, state.parsed)} />
+  </div>
+)
+
+app(state, actions, view, document.body)
